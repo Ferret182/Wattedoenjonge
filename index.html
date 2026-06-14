@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Events</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    #events-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #eee;
+    }
+
+    .category {
+      display: inline-block;
+      background: #EEEDFE;
+      color: #3C3489;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card h2 {
+      font-size: 17px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: #111;
+    }
+
+    .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .meta-row span.icon {
+      font-size: 15px;
+    }
+
+    .price {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .price-free {
+      background: #EAF3DE;
+      color: #27500A;
+    }
+
+    .price-paid {
+      background: #FAEEDA;
+      color: #633806;
+    }
+
+    .desc {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #999;
+      grid-column: 1 / -1;
+      padding: 60px 0;
+      font-size: 15px;
+    }
+
+    .error {
+      text-align: center;
+      color: #c0392b;
+      grid-column: 1 / -1;
+      padding: 60px 0;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Events in my city</h1>
+  <p class="subtitle">What's happening around you</p>
+
+  <div id="events-list">
+    <p class="loading">Loading events...</p>
+  </div>
+
+  <script>
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("nl-NL", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+    }
+
+    function formatTime(timeStr) {
+      if (!timeStr) return "";
+      return timeStr.slice(0, 5);
+    }
+
+    function formatPrice(price) {
+      if (!price || price === "0" || price.toLowerCase() === "free" || price === "gratis") {
+        return '<span class="price price-free">Free entry</span>';
+      }
+      return '<span class="price price-paid">' + price + '</span>';
+    }
+
+    fetch("https://wattedoenjonge-production.up.railway.app/events")
+      .then(response => response.json())
+      .then(events => {
+        const container = document.getElementById("events-list");
+
+        if (events.length === 0) {
+          container.innerHTML = '<p class="loading">No events found.</p>';
+          return;
+        }
+
+        container.innerHTML = "";
+
+        events.forEach(event => {
+          const timeRange = event.starting_time && event.ending_time
+            ? formatTime(event.starting_time) + " – " + formatTime(event.ending_time)
+            : event.starting_time
+              ? formatTime(event.starting_time)
+              : "";
+
+          container.innerHTML += `
+            <div class="card">
+              ${event.category ? '<span class="category">' + event.category + '</span>' : ''}
+              <h2>${event.title || "Untitled event"}</h2>
+              <div class="meta">
+                ${event.location ? '<div class="meta-row"><span class="icon">📍</span> ' + event.location + '</div>' : ''}
+                ${event.date ? '<div class="meta-row"><span class="icon">🗓️</span> ' + formatDate(event.date) + '</div>' : ''}
+                ${timeRange ? '<div class="meta-row"><span class="icon">🕐</span> ' + timeRange + '</div>' : ''}
+              </div>
+              ${formatPrice(event.price)}
+              ${event.description ? '<p class="desc">' + event.description + '</p>' : ''}
+            </div>
+          `;
+        });
+      })
+      .catch(error => {
+        document.getElementById("events-list").innerHTML =
+          '<p class="error">Could not load events. Please try again later.</p>';
+      });
+  </script>
+
+</body>
+</html>

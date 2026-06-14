@@ -1,45 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
-  <title>Local Events</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evenementen in de buurt</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: sans-serif;
       background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
+      color: #222;
+      padding: 0 0 60px;
     }
 
-    h1 {
+    .hero {
+      background: white;
+      border-bottom: 1px solid #eee;
       text-align: center;
-      color: #333;
+      padding: 48px 20px 36px;
+      margin-bottom: 40px;
     }
 
-    #events-list {
+    .hero h1 {
+      font-size: 32px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .hero p a {
+      color: #3367d6;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero p a:hover {
+      text-decoration: underline;
+    }
+
+    .week-section {
+      max-width: 1100px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .week-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .week-label.current {
+      color: #3367d6;
+    }
+
+    .week-line {
+      flex: 1;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      max-width: 1100px;
-      margin: 0 auto;
+      gap: 16px;
     }
 
-    .event-card {
+    .card {
       background: white;
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px solid #eee;
     }
 
-    .event-card h2 {
-      margin: 0 0 8px;
-      color: #222;
-      font-size: 18px;
-    }
-
-    .event-card p {
-      margin: 4px 0;
-      color: #666;
-      font-size: 14px;
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
     }
 
     .category {
@@ -47,9 +102,8 @@
       background: #e8f0fe;
       color: #3367d6;
       border-radius: 20px;
-      padding: 4px 12px;
+      padding: 3px 12px;
       font-size: 12px;
-      margin-bottom: 10px;
     }
 
     .price-free {
@@ -57,9 +111,8 @@
       background: #e6f4ea;
       color: #1e7e34;
       border-radius: 20px;
-      padding: 4px 12px;
+      padding: 3px 12px;
       font-size: 12px;
-      margin-top: 10px;
     }
 
     .price-paid {
@@ -67,22 +120,70 @@
       background: #fff3e0;
       color: #e65100;
       border-radius: 20px;
-      padding: 4px 12px;
+      padding: 3px 12px;
       font-size: 12px;
-      margin-top: 10px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      font-weight: 500;
+      color: #111;
+      margin-bottom: 12px;
+    }
+
+    .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .desc {
+      font-size: 13px;
+      color: #777;
+      line-height: 1.6;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 12px;
+      margin-top: 12px;
     }
 
     .loading {
       text-align: center;
       color: #999;
-      margin-top: 60px;
+      padding: 60px 0;
+      font-size: 15px;
+    }
+
+    .error {
+      text-align: center;
+      color: #c0392b;
+      padding: 60px 0;
+      font-size: 15px;
+    }
+
+    .recurring-badge {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 8px;
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <h1>Events in my city</h1>
-  <div id="events-list"><p class="loading">Loading events...</p></div>
+  <div class="hero">
+    <h1>Evenementen in de buurt</h1>
+    <p>Voor suggesties DM <a href="https://instagram.com/timo.182" target="_blank">@timo.182</a> op instagram</p>
+  </div>
+
+  <div id="app"><p class="loading">Evenementen laden...</p></div>
 
   <script>
     function formatTime(t) {
@@ -92,40 +193,108 @@
 
     function formatPrice(price) {
       if (!price || price === "0" || price.toLowerCase() === "free" || price === "gratis") {
-        return '<span class="price-free">Free entry</span>';
+        return '<span class="price-free">Gratis</span>';
       }
       return '<span class="price-paid">' + price + '</span>';
+    }
+
+    function formatDayDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("nl-NL", { weekday: "long", day: "numeric", month: "long" });
+    }
+
+    function getWeekKey(dateStr) {
+      const d = new Date(dateStr);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(d.setDate(diff));
+      return monday.toISOString().slice(0, 10);
+    }
+
+    function getWeekLabel(mondayStr) {
+      const today = new Date();
+      const monday = new Date(mondayStr);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+
+      const todayMonday = new Date(today);
+      const todayDay = today.getDay();
+      const todayDiff = today.getDate() - todayDay + (todayDay === 0 ? -6 : 1);
+      todayMonday.setDate(todayDiff);
+
+      const diffWeeks = Math.round((monday - todayMonday) / (7 * 24 * 60 * 60 * 1000));
+      const fmt = d => d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+
+      if (diffWeeks === 0) return { label: "Deze week — " + fmt(monday) + " t/m " + fmt(sunday), current: true };
+      if (diffWeeks === 1) return { label: "Volgende week — " + fmt(monday) + " t/m " + fmt(sunday), current: false };
+      return { label: fmt(monday) + " t/m " + fmt(sunday), current: false };
     }
 
     fetch("https://wattedoenjonge-production.up.railway.app/events")
       .then(response => response.json())
       .then(events => {
+        const app = document.getElementById("app");
 
-        const container = document.getElementById("events-list")
+        if (!events.length) {
+          app.innerHTML = '<p class="loading">Geen evenementen gevonden.</p>';
+          return;
+        }
 
         events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-        container.innerHTML = ""
-
+        const weeks = {};
         events.forEach(event => {
-          const timeRange = event.starting_time && event.ending_time
-            ? formatTime(event.starting_time) + " – " + formatTime(event.ending_time)
-            : formatTime(event.starting_time);
+          const key = getWeekKey(event.date);
+          if (!weeks[key]) weeks[key] = [];
+          weeks[key].push(event);
+        });
 
-          container.innerHTML += `
-            <div class="event-card">
-              <span class="category">${event.category}</span>
-              <h2>${event.title}</h2>
-              <p>📍 ${event.location}</p>
-              <p>🗓️ ${new Date(event.date).toLocaleDateString("nl-NL", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
-              ${timeRange ? `<p>🕐 ${timeRange}</p>` : ""}
-              ${formatPrice(event.price)}
-              <p style="margin-top: 10px;">${event.description}</p>
+        app.innerHTML = "";
+
+        Object.keys(weeks).sort().forEach(weekKey => {
+          const { label, current } = getWeekLabel(weekKey);
+          const section = document.createElement("div");
+          section.className = "week-section";
+
+          let cards = "";
+          weeks[weekKey].forEach(event => {
+            const timeRange = event.starting_time && event.ending_time
+              ? formatTime(event.starting_time) + " – " + formatTime(event.ending_time)
+              : formatTime(event.starting_time);
+
+            cards += `
+              <div class="card">
+                <div class="card-top">
+                  ${event.category ? '<span class="category">' + event.category + '</span>' : '<span></span>'}
+                  ${formatPrice(event.price)}
+                </div>
+                <h2>${event.title || "Naamloos evenement"}</h2>
+                <div class="meta">
+                  ${event.location ? '<div class="meta-row">📍 ' + event.location + '</div>' : ''}
+                  <div class="meta-row">🗓️ ${formatDayDate(event.date)}</div>
+                  ${timeRange ? '<div class="meta-row">🕐 ' + timeRange + '</div>' : ''}
+                </div>
+                ${event.description ? '<p class="desc">' + event.description + '</p>' : ''}
+                ${event.recurring ? '<span class="recurring-badge">↻ Wekelijks terugkerend</span>' : ''}
+              </div>
+            `;
+          });
+
+          section.innerHTML = `
+            <div class="week-header">
+              <span class="week-label ${current ? 'current' : ''}">${label}</span>
+              <div class="week-line"></div>
             </div>
-          `
-        })
+            <div class="cards-grid">${cards}</div>
+          `;
 
+          app.appendChild(section);
+        });
       })
+      .catch(() => {
+        document.getElementById("app").innerHTML =
+          '<p class="error">Kon evenementen niet laden. Probeer het later opnieuw.</p>';
+      });
   </script>
 
 </body>

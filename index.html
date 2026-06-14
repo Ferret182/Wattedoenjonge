@@ -7,16 +7,42 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+      --border: #eee;
+      --text-primary: #111;
+      --text-secondary: #666;
+      --text-muted: #999;
+      --week-line: #e0e0e0;
+      --desc-border: #f0f0f0;
+      --hero-border: #eee;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111111;
+        --surface: #1e1e1e;
+        --border: #2e2e2e;
+        --text-primary: #f0f0f0;
+        --text-secondary: #aaa;
+        --text-muted: #666;
+        --week-line: #2e2e2e;
+        --desc-border: #2a2a2a;
+        --hero-border: #2e2e2e;
+      }
+    }
+
     body {
       font-family: sans-serif;
-      background: #f5f5f5;
-      color: #222;
+      background: var(--bg);
+      color: var(--text-primary);
       padding: 0 0 60px;
     }
 
     .hero {
-      background: white;
-      border-bottom: 1px solid #eee;
+      background: var(--surface);
+      border-bottom: 1px solid var(--hero-border);
       text-align: center;
       padding: 48px 20px 36px;
       margin-bottom: 40px;
@@ -25,14 +51,14 @@
     .hero h1 {
       font-size: 32px;
       font-weight: 600;
-      color: #111;
+      color: var(--text-primary);
       margin-bottom: 10px;
       letter-spacing: -0.5px;
     }
 
     .hero p {
       font-size: 14px;
-      color: #999;
+      color: var(--text-muted);
     }
 
     .hero p a {
@@ -61,7 +87,7 @@
     .week-label {
       font-size: 13px;
       font-weight: 500;
-      color: #888;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       white-space: nowrap;
@@ -74,7 +100,7 @@
     .week-line {
       flex: 1;
       height: 1px;
-      background: #e0e0e0;
+      background: var(--week-line);
     }
 
     .cards-grid {
@@ -84,10 +110,10 @@
     }
 
     .card {
-      background: white;
+      background: var(--surface);
       border-radius: 12px;
       padding: 20px;
-      border: 1px solid #eee;
+      border: 1px solid var(--border);
     }
 
     .card-top {
@@ -99,35 +125,56 @@
 
     .category {
       display: inline-block;
-      background: #e8f0fe;
-      color: #3367d6;
+      background: #1a2f6e22;
+      color: #5b8dee;
       border-radius: 20px;
       padding: 3px 12px;
       font-size: 12px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      .category {
+        background: #e8f0fe;
+        color: #3367d6;
+      }
     }
 
     .price-free {
       display: inline-block;
-      background: #e6f4ea;
-      color: #1e7e34;
+      background: #1a3a2022;
+      color: #4caf50;
       border-radius: 20px;
       padding: 3px 12px;
       font-size: 12px;
     }
 
+    @media (prefers-color-scheme: light) {
+      .price-free {
+        background: #e6f4ea;
+        color: #1e7e34;
+      }
+    }
+
     .price-paid {
       display: inline-block;
-      background: #fff3e0;
-      color: #e65100;
+      background: #3a200a22;
+      color: #ff9800;
       border-radius: 20px;
       padding: 3px 12px;
       font-size: 12px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      .price-paid {
+        background: #fff3e0;
+        color: #e65100;
+      }
     }
 
     .card h2 {
       font-size: 16px;
       font-weight: 500;
-      color: #111;
+      color: var(--text-primary);
       margin-bottom: 12px;
     }
 
@@ -142,35 +189,35 @@
       align-items: center;
       gap: 8px;
       font-size: 13px;
-      color: #666;
+      color: var(--text-secondary);
     }
 
     .desc {
       font-size: 13px;
-      color: #777;
+      color: var(--text-secondary);
       line-height: 1.6;
-      border-top: 1px solid #f0f0f0;
+      border-top: 1px solid var(--desc-border);
       padding-top: 12px;
       margin-top: 12px;
     }
 
     .loading {
       text-align: center;
-      color: #999;
+      color: var(--text-muted);
       padding: 60px 0;
       font-size: 15px;
     }
 
     .error {
       text-align: center;
-      color: #c0392b;
+      color: #e74c3c;
       padding: 60px 0;
       font-size: 15px;
     }
 
     .recurring-badge {
       font-size: 11px;
-      color: #aaa;
+      color: var(--text-muted);
       margin-top: 8px;
       display: block;
     }

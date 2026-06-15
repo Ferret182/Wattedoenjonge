@@ -17,6 +17,8 @@
       --week-line: #e0e0e0;
       --desc-border: #f0f0f0;
       --hero-border: #eee;
+      --input-bg: #f9f9f9;
+      --overlay-bg: rgba(0,0,0,0.4);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -30,6 +32,8 @@
         --week-line: #2e2e2e;
         --desc-border: #2a2a2a;
         --hero-border: #2e2e2e;
+        --input-bg: #2a2a2a;
+        --overlay-bg: rgba(0,0,0,0.7);
       }
     }
 
@@ -40,6 +44,7 @@
       padding: 0 0 60px;
     }
 
+    /* ── Hero ── */
     .hero {
       background: var(--surface);
       border-bottom: 1px solid var(--hero-border);
@@ -52,13 +57,14 @@
       font-size: 32px;
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       letter-spacing: -0.5px;
     }
 
     .hero p {
       font-size: 14px;
       color: var(--text-muted);
+      margin-bottom: 24px;
     }
 
     .hero p a {
@@ -67,10 +73,24 @@
       font-weight: 500;
     }
 
-    .hero p a:hover {
-      text-decoration: underline;
+    .hero p a:hover { text-decoration: underline; }
+
+    .btn-submit {
+      display: inline-block;
+      background: #3367d6;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
     }
 
+    .btn-submit:hover { background: #2a56c0; }
+
+    /* ── Week sections ── */
     .week-section {
       max-width: 1100px;
       margin: 0 auto 40px;
@@ -93,9 +113,7 @@
       white-space: nowrap;
     }
 
-    .week-label.current {
-      color: #3367d6;
-    }
+    .week-label.current { color: #3367d6; }
 
     .week-line {
       flex: 1;
@@ -109,6 +127,7 @@
       gap: 16px;
     }
 
+    /* ── Cards ── */
     .card {
       background: var(--surface);
       border-radius: 12px;
@@ -133,10 +152,7 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      .category {
-        background: #1a2f6e33;
-        color: #5b8dee;
-      }
+      .category { background: #1a2f6e33; color: #5b8dee; }
     }
 
     .price-free {
@@ -149,10 +165,7 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      .price-free {
-        background: #1a3a2033;
-        color: #4caf50;
-      }
+      .price-free { background: #1a3a2033; color: #4caf50; }
     }
 
     .price-paid {
@@ -165,10 +178,7 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      .price-paid {
-        background: #3a200a33;
-        color: #ff9800;
-      }
+      .price-paid { background: #3a200a33; color: #ff9800; }
     }
 
     .card h2 {
@@ -178,11 +188,7 @@
       margin-bottom: 12px;
     }
 
-    .meta {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+    .meta { display: flex; flex-direction: column; gap: 5px; }
 
     .meta-row {
       display: flex;
@@ -201,6 +207,13 @@
       margin-top: 12px;
     }
 
+    .recurring-badge {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: block;
+    }
+
     .loading {
       text-align: center;
       color: var(--text-muted);
@@ -215,11 +228,141 @@
       font-size: 15px;
     }
 
-    .recurring-badge {
-      font-size: 11px;
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--overlay-bg);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 22px;
       color: var(--text-muted);
-      margin-top: 8px;
-      display: block;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .modal-close:hover { color: var(--text-primary); }
+
+    /* ── Form ── */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--text-primary);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: sans-serif;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #3367d6;
+    }
+
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .btn-send {
+      width: 100%;
+      background: #3367d6;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-send:hover { background: #2a56c0; }
+    .btn-send:disabled { background: #aaa; cursor: not-allowed; }
+
+    .form-success {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .form-success .check {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .form-success h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .form-success p {
+      font-size: 14px;
+      color: var(--text-muted);
     }
   </style>
 </head>
@@ -228,11 +371,151 @@
   <div class="hero">
     <h1>Evenementen in de buurt</h1>
     <p>Voor suggesties DM <a href="https://instagram.com/timo.182" target="_blank">@timo.182</a> op instagram</p>
+    <button class="btn-submit" onclick="openModal()">+ Evenement indienen</button>
   </div>
 
   <div id="app"><p class="loading">Evenementen laden...</p></div>
 
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Evenement indienen</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <div id="form-content">
+        <p class="form-note">Jouw evenement wordt eerst beoordeeld voordat het op de pagina verschijnt.</p>
+
+        <div class="form-group">
+          <label>Naam evenement *</label>
+          <input type="text" id="f-title" placeholder="bijv. Zomerfestival Amsterdam" />
+        </div>
+
+        <div class="form-group">
+          <label>Omschrijving</label>
+          <textarea id="f-description" placeholder="Wat houdt het evenement in?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Locatie</label>
+          <input type="text" id="f-location" placeholder="bijv. Vondelpark, Amsterdam" />
+        </div>
+
+        <div class="form-group">
+          <label>Categorie</label>
+          <select id="f-category">
+            <option value="">— Selecteer categorie —</option>
+            <option>Muziek</option>
+            <option>Sport</option>
+            <option>Kunst</option>
+            <option>Eten & Drinken</option>
+            <option>Markt</option>
+            <option>Festival</option>
+            <option>Anders</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Datum</label>
+          <input type="date" id="f-date" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Begintijd</label>
+            <input type="time" id="f-start" />
+          </div>
+          <div class="form-group">
+            <label>Eindtijd</label>
+            <input type="time" id="f-end" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Prijs (€) — laat leeg als gratis</label>
+          <input type="number" id="f-price" placeholder="bijv. 12.50" min="0" step="0.01" />
+        </div>
+
+        <div class="form-group">
+          <label>Jouw contactgegeven (optioneel)</label>
+          <input type="text" id="f-contact" placeholder="bijv. e-mail of Instagram" />
+        </div>
+
+        <button class="btn-send" id="btn-send" onclick="submitForm()">Indienen</button>
+      </div>
+
+      <div id="form-success" style="display:none;" class="form-success">
+        <div class="check">✅</div>
+        <h3>Bedankt voor je inzending!</h3>
+        <p>We beoordelen je evenement zo snel mogelijk.</p>
+      </div>
+    </div>
+  </div>
+
   <script>
+    /* ── Modal ── */
+    function openModal() {
+      document.getElementById("modal").classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById("modal")) closeModal();
+    }
+
+    /* ── Form submit ── */
+    async function submitForm() {
+      const title = document.getElementById("f-title").value.trim();
+      if (!title) {
+        alert("Vul minimaal de naam van het evenement in.");
+        return;
+      }
+
+      const btn = document.getElementById("btn-send");
+      btn.disabled = true;
+      btn.textContent = "Bezig met versturen...";
+
+      const price = document.getElementById("f-price").value;
+
+      const payload = {
+        title,
+        description: document.getElementById("f-description").value.trim() || null,
+        location:    document.getElementById("f-location").value.trim() || null,
+        category:    document.getElementById("f-category").value || null,
+        date:        document.getElementById("f-date").value || null,
+        starting_time: document.getElementById("f-start").value || null,
+        ending_time:   document.getElementById("f-end").value || null,
+        price:       price !== "" ? parseFloat(price) : null,
+        contact:     document.getElementById("f-contact").value.trim() || null,
+      };
+
+      try {
+        const res = await fetch("https://wattedoenjonge-production.up.railway.app/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          document.getElementById("form-content").style.display = "none";
+          document.getElementById("form-success").style.display = "block";
+        } else {
+          throw new Error();
+        }
+      } catch {
+        alert("Er is iets misgegaan. Probeer het opnieuw.");
+        btn.disabled = false;
+        btn.textContent = "Indienen";
+      }
+    }
+
+    /* ── Helpers ── */
     function formatTime(t) {
       if (!t) return "";
       return t.slice(0, 5);
@@ -242,20 +525,16 @@
       if (price === null || price === undefined || price === "") {
         return '<span class="price-free">Gratis</span>';
       }
-
       const num = parseFloat(price);
-
       if (isNaN(num) || num === 0) {
         return '<span class="price-free">Gratis</span>';
       }
-
       const formatted = num.toLocaleString("nl-NL", {
         style: "currency",
         currency: "EUR",
         minimumFractionDigits: num % 1 === 0 ? 0 : 2,
         maximumFractionDigits: 2
       });
-
       return '<span class="price-paid">' + formatted + '</span>';
     }
 
@@ -291,8 +570,9 @@
       return { label: fmt(monday) + " t/m " + fmt(sunday), current: false };
     }
 
+    /* ── Load events ── */
     fetch("https://wattedoenjonge-production.up.railway.app/events")
-      .then(response => response.json())
+      .then(r => r.json())
       .then(events => {
         const app = document.getElementById("app");
 

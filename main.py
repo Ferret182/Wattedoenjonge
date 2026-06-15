@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client
+from pydantic import BaseModel
+from typing import Optional
 from datetime import date, timedelta
 import os
 
@@ -17,12 +19,12 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 db = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+
 @app.get("/events")
 def get_events():
     result = db.table("events").select("*").execute()
     events = result.data
 
-    # find the latest date among non-recurring events
     non_recurring_dates = [
         date.fromisoformat(e["date"])
         for e in events
@@ -48,3 +50,21 @@ def get_events():
             expanded.append(event)
 
     return expanded
+
+
+class EventSubmission(BaseModel):
+    title: str
+    description: Optional[str] = None
+    location: Optional[str] = None
+    date: Optional[str] = None
+    starting_time: Optional[str] = None
+    ending_time: Optional[str] = None
+    price: Optional[float] = None
+    category: Optional[str] = None
+    contact: Optional[str] = None
+
+
+@app.post("/submit")
+def submit_event(event: EventSubmission):
+    db.table("pending_events").insert(event.dict()).execute()
+    return {"message": "Bedankt! Je evenement wordt beoordeeld."}

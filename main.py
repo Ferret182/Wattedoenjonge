@@ -68,3 +68,38 @@ class EventSubmission(BaseModel):
 def submit_event(event: EventSubmission):
     db.table("pending_events").insert(event.dict()).execute()
     return {"message": "Bedankt! Je evenement wordt beoordeeld."}
+
+
+@app.get("/pending")
+def get_pending():
+    result = db.table("pending_events").select("*").order("submitted_at", desc=False).execute()
+    return result.data
+
+
+@app.post("/approve/{id}")
+def approve_event(id: int):
+    # Fetch the pending event
+    result = db.table("pending_events").select("*").eq("id", id).execute()
+    if not result.data:
+        return {"error": "Not found"}, 404
+
+    pending = result.data[0]
+
+    # Remove fields that don't belong in events table
+    pending.pop("id", None)
+    pending.pop("submitted_at", None)
+    pending.pop("contact", None)
+
+    # Insert into events table
+    db.table("events").insert(pending).execute()
+
+    # Delete from pending
+    db.table("pending_events").delete().eq("id", id).execute()
+
+    return {"message": "Goedgekeurd"}
+
+
+@app.delete("/reject/{id}")
+def reject_event(id: int):
+    db.table("pending_events").delete().eq("id", id).execute()
+    return {"message": "Afgewezen"}

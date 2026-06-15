@@ -125,49 +125,49 @@
 
     .category {
       display: inline-block;
-      background: #1a2f6e22;
-      color: #5b8dee;
+      background: #e8f0fe;
+      color: #3367d6;
       border-radius: 20px;
       padding: 3px 12px;
       font-size: 12px;
     }
 
-    @media (prefers-color-scheme: light) {
+    @media (prefers-color-scheme: dark) {
       .category {
-        background: #e8f0fe;
-        color: #3367d6;
+        background: #1a2f6e33;
+        color: #5b8dee;
       }
     }
 
     .price-free {
       display: inline-block;
-      background: #1a3a2022;
-      color: #4caf50;
+      background: #e6f4ea;
+      color: #1e7e34;
       border-radius: 20px;
       padding: 3px 12px;
       font-size: 12px;
     }
 
-    @media (prefers-color-scheme: light) {
+    @media (prefers-color-scheme: dark) {
       .price-free {
-        background: #e6f4ea;
-        color: #1e7e34;
+        background: #1a3a2033;
+        color: #4caf50;
       }
     }
 
     .price-paid {
       display: inline-block;
-      background: #3a200a22;
-      color: #ff9800;
+      background: #fff3e0;
+      color: #e65100;
       border-radius: 20px;
       padding: 3px 12px;
       font-size: 12px;
     }
 
-    @media (prefers-color-scheme: light) {
+    @media (prefers-color-scheme: dark) {
       .price-paid {
-        background: #fff3e0;
-        color: #e65100;
+        background: #3a200a33;
+        color: #ff9800;
       }
     }
 
@@ -239,10 +239,24 @@
     }
 
     function formatPrice(price) {
-      if (!price || price === "0" || price.toLowerCase() === "free" || price === "gratis") {
+      if (price === null || price === undefined || price === "") {
         return '<span class="price-free">Gratis</span>';
       }
-      return '<span class="price-paid">' + price + '</span>';
+
+      const num = parseFloat(price);
+
+      if (isNaN(num) || num === 0) {
+        return '<span class="price-free">Gratis</span>';
+      }
+
+      const formatted = num.toLocaleString("nl-NL", {
+        style: "currency",
+        currency: "EUR",
+        minimumFractionDigits: num % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+      });
+
+      return '<span class="price-paid">' + formatted + '</span>';
     }
 
     function formatDayDate(dateStr) {
